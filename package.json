@@ -4,8 +4,8 @@
     "scripts": {
         "dev": "vite",
         "build": "tsc && vite build",
-        "preview": "vite preview",
-        "wrangler": "wrangler pages dev dist"
+        "cldev": "wrangler pages dev dist",
+        "cldeploy": "wrangler pages deploy"
     },
     "devDependencies": {
         "typescript": "~6.0.3",
