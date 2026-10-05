@@ -1,5 +1,6 @@
 {
     "name": "m2s",
+    "packageManager": "pnpm@12.9.1"
     "scripts": {
         "dev": "vite",
         "build": "tsc && vite build",
