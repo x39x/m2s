@@ -5,7 +5,7 @@
         "dev": "vite",
         "build": "tsc && vite build",
         "cldev": "wrangler pages dev dist",
-        "cldeploy": "wrangler pages deploy"
+        "cldeploy": "wrangler pages functions build --outdir=dist && mv dist/index.js dist/_worker.js "
     },
     "devDependencies": {
         "typescript": "~6.0.3",
