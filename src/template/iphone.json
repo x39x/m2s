@@ -1,0 +1,559 @@
+{
+    "log": {
+        "level": "info",
+        "timestamp": true
+    },
+    "experimental": {
+        "cache_file": {
+            "enabled": true,
+            "store_fakeip": true,
+            "store_dns": true
+        }
+    },
+    "dns": {
+        "servers": [
+            {
+                "type": "https",
+                "tag": "dialing",
+                "server": "223.5.5.5"
+            },
+            {
+                "type": "https",
+                "tag": "cn_dns",
+                "server": "dns.alidns.com",
+                "domain_resolver": {
+                    "server": "dialing"
+                }
+            },
+            {
+                "type": "https",
+                "tag": "proxy_dns",
+                "server": "cloudflare-dns.com",
+                "detour": "albatross"
+            },
+            {
+                "type": "fakeip",
+                "tag": "fake_dns",
+                "inet4_range": "198.18.0.0/15",
+                "inet6_range": "fc00::/18"
+            }
+        ],
+        "rules": [
+            {
+                "clash_mode": "direct",
+                "server": "cn_dns"
+            },
+            {
+                "clash_mode": "global",
+                "server": "proxy_dns"
+            },
+            {
+                "rule_set": "lan_nonip",
+                "server": "cn_dns"
+            },
+            {
+                "rule_set": "private",
+                "server": "cn_dns"
+            },
+            {
+                "rule_set": "ads",
+                "action": "reject"
+            },
+            {
+                "query_type": ["A", "AAAA"],
+                "server": "fake_dns"
+            },
+            {
+                "rule_set": "direct_nonip",
+                "server": "cn_dns"
+            },
+            {
+                "rule_set": "apple_cdn_nonip",
+                "server": "cn_dns"
+            },
+            {
+                "rule_set": "apple_cn_nonip",
+                "server": "cn_dns"
+            },
+            {
+                "rule_set": "ms_cdn_nonip",
+                "server": "cn_dns"
+            },
+            {
+                "rule_set": "domestic_nonip",
+                "server": "cn_dns"
+            },
+            {
+                "rule_set": ["cnsite"],
+                "server": "cn_dns"
+            }
+        ],
+        "final": "proxy_dns"
+    },
+    "inbounds": [
+        {
+            "type": "tun",
+            "tag": "tun-in",
+            "mtu": 9000,
+            "address": ["172.18.0.1/30", "fdfe:dcba:9876::1/126"],
+            "dns_mode": "hijack",
+            "auto_route": true,
+            "strict_route": true,
+            "stack": "mixed"
+        }
+    ],
+    "outbounds": [
+        {
+            "type": "selector",
+            "tag": "albatross",
+            "interrupt_exist_connections": true,
+            "outbounds": ["cuckoo", "godwit", "seagull"],
+            "default": "cuckoo"
+        },
+        {
+            "type": "selector",
+            "tag": "cuckoo",
+            "interrupt_exist_connections": true,
+            "outbounds": ["urltest"],
+            "default": "urltest"
+        },
+        {
+            "type": "selector",
+            "tag": "godwit",
+            "interrupt_exist_connections": true,
+            "outbounds": ["urltest"],
+            "default": "urltest"
+        },
+        {
+            "type": "selector",
+            "tag": "seagull",
+            "interrupt_exist_connections": true,
+            "outbounds": ["urltest"],
+            "default": "urltest"
+        },
+        {
+            "type": "selector",
+            "tag": "ai",
+            "interrupt_exist_connections": true,
+            "outbounds": ["albatross", "cuckoo", "godwit", "seagull"],
+            "default": "albatross"
+        },
+        {
+            "type": "selector",
+            "tag": "stream",
+            "interrupt_exist_connections": true,
+            "outbounds": ["albatross", "cuckoo", "godwit", "seagull"],
+            "default": "albatross"
+        },
+        {
+            "type": "selector",
+            "tag": "stream-cn",
+            "interrupt_exist_connections": true,
+            "outbounds": ["albatross", "cuckoo", "godwit", "seagull", "swift"],
+            "default": "swift"
+        },
+        {
+            "type": "selector",
+            "tag": "apple",
+            "interrupt_exist_connections": true,
+            "outbounds": ["albatross", "cuckoo", "godwit", "seagull", "swift"],
+            "default": "albatross"
+        },
+        {
+            "type": "selector",
+            "tag": "apple-cn",
+            "interrupt_exist_connections": true,
+            "outbounds": ["albatross", "cuckoo", "godwit", "seagull", "swift"],
+            "default": "swift"
+        },
+        {
+            "type": "urltest",
+            "tag": "urltest",
+            "interrupt_exist_connections": true,
+            "outbounds": []
+        },
+        {
+            "type": "direct",
+            "tag": "swift"
+        }
+    ],
+    "route": {
+        "rules": [
+            {
+                "action": "sniff"
+            },
+            {
+                "type": "logical",
+                "mode": "or",
+                "rules": [
+                    {
+                        "protocol": "dns"
+                    },
+                    {
+                        "port": 53
+                    }
+                ],
+                "action": "hijack-dns"
+            },
+            {
+                "clash_mode": "global",
+                "outbound": "albatross"
+            },
+            {
+                "clash_mode": "direct",
+                "outbound": "swift"
+            },
+            {
+                "protocol": "ntp",
+                "outbound": "swift"
+            },
+            {
+                "rule_set": "lan_nonip",
+                "outbound": "swift"
+            },
+            {
+                "rule_set": "private",
+                "outbound": "swift"
+            },
+            {
+                "rule_set": "direct_nonip",
+                "outbound": "swift"
+            },
+            {
+                "rule_set": "ai_nonip",
+                "outbound": "ai"
+            },
+            {
+                "rule_set": "ai_geosite",
+                "outbound": "ai"
+            },
+            {
+                "rule_set": "stream_cn",
+                "outbound": "stream-cn"
+            },
+            {
+                "rule_set": "stream_nonip",
+                "outbound": "stream"
+            },
+            {
+                "rule_set": "apple_cdn_nonip",
+                "outbound": "apple-cn"
+            },
+            {
+                "rule_set": "apple_cn_nonip",
+                "outbound": "apple-cn"
+            },
+            {
+                "rule_set": "ms_cdn_nonip",
+                "outbound": "apple-cn"
+            },
+            {
+                "rule_set": "apple_services_nonip",
+                "outbound": "apple"
+            },
+            {
+                "rule_set": "apple_ai_nonip",
+                "outbound": "apple"
+            },
+            {
+                "rule_set": "ms_nonip",
+                "outbound": "apple"
+            },
+            {
+                "rule_set": "domestic_nonip",
+                "outbound": "swift"
+            },
+            {
+                "rule_set": "global_nonip",
+                "outbound": "albatross"
+            },
+            {
+                "rule_set": "gfw",
+                "outbound": "albatross"
+            },
+            {
+                "rule_set": "nocnsite",
+                "outbound": "albatross"
+            },
+            {
+                "rule_set": "cnsite",
+                "outbound": "swift"
+            },
+            {
+                "rule_set": "ads",
+                "action": "reject"
+            },
+            {
+                "action": "resolve",
+                "server": "proxy_dns"
+            },
+            {
+                "ip_is_private": true,
+                "outbound": "swift"
+            },
+            {
+                "rule_set": "apple_services_ip",
+                "outbound": "apple"
+            },
+            {
+                "rule_set": "stream_ip",
+                "outbound": "stream"
+            },
+            {
+                "rule_set": "china_ip",
+                "outbound": "swift"
+            },
+            {
+                "rule_set": "china_ipv6",
+                "outbound": "swift"
+            },
+            {
+                "rule_set": "cnip",
+                "outbound": "swift"
+            }
+        ],
+        "rule_set": [
+            {
+                "type": "remote",
+                "tag": "ads",
+                "url": "https://testingcf.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-category-ads-all.srs",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "ai_geosite",
+                "url": "https://testingcf.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-category-ai-!cn.srs",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "gfw",
+                "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@refs/heads/sing/geo/geosite/gfw.srs",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "cnsite",
+                "url": "https://testingcf.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-cn.srs",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "nocnsite",
+                "url": "https://testingcf.jsdelivr.net/gh/SagerNet/sing-geosite@rule-set/geosite-geolocation-!cn.srs",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "private",
+                "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@refs/heads/sing/geo/geosite/private.srs",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "cnip",
+                "url": "https://testingcf.jsdelivr.net/gh/SagerNet/sing-geoip@rule-set/geoip-cn.srs",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "direct_nonip",
+                "url": "https://ruleset.skk.moe/sing-box/non_ip/direct.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "ai_nonip",
+                "url": "https://ruleset.skk.moe/sing-box/non_ip/ai.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "stream_nonip",
+                "url": "https://ruleset.skk.moe/sing-box/non_ip/stream.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "apple_services_nonip",
+                "url": "https://ruleset.skk.moe/sing-box/non_ip/apple_services.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "apple_ai_nonip",
+                "url": "https://ruleset.skk.moe/sing-box/non_ip/apple_intelligence.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "apple_cn_nonip",
+                "url": "https://ruleset.skk.moe/sing-box/non_ip/apple_cn.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "apple_cdn_nonip",
+                "url": "https://ruleset.skk.moe/sing-box/non_ip/apple_cdn.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "ms_nonip",
+                "url": "https://ruleset.skk.moe/sing-box/non_ip/microsoft.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "ms_cdn_nonip",
+                "url": "https://ruleset.skk.moe/sing-box/non_ip/microsoft_cdn.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "global_nonip",
+                "url": "https://ruleset.skk.moe/sing-box/non_ip/global.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "domestic_nonip",
+                "url": "https://ruleset.skk.moe/sing-box/non_ip/domestic.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "lan_nonip",
+                "url": "https://ruleset.skk.moe/sing-box/non_ip/lan.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "apple_services_ip",
+                "url": "https://ruleset.skk.moe/sing-box/ip/apple_services.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "stream_ip",
+                "url": "https://ruleset.skk.moe/sing-box/ip/stream.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "china_ip",
+                "url": "https://ruleset.skk.moe/sing-box/ip/china_ip.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "type": "remote",
+                "tag": "china_ipv6",
+                "url": "https://ruleset.skk.moe/sing-box/ip/china_ip_ipv6.json",
+                "update_interval": "24h0m0s",
+                "http_client": {
+                    "disable_version_fallback": true,
+                    "detour": "albatross"
+                }
+            },
+            {
+                "tag": "stream_cn",
+                "rules": [
+                    {
+                        "domain_suffix": ["bilibili.com", "iqiyi.com"]
+                    }
+                ]
+            }
+        ],
+        "final": "albatross",
+        "auto_detect_interface": true,
+        "default_domain_resolver": "cn_dns"
+    }
+}
