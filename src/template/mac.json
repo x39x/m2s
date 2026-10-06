@@ -45,7 +45,7 @@
             },
             {
                 "clash_mode": "global",
-                "server": "proxy_dns"
+                "server": "fake_dns"
             },
             {
                 "rule_set": ["lan", "geosite-private"],
@@ -82,7 +82,7 @@
     "inbounds": [
         {
             "type": "tun",
-            "tag": "tun-in",
+            "tag": "SBTUN",
             "mtu": 9000,
             "address": ["172.18.0.1/30", "fdfe:dcba:9876::1/126"],
             "dns_mode": "hijack",
@@ -92,7 +92,7 @@
         },
         {
             "type": "mixed",
-            "tag": "mixed-in",
+            "tag": "SBMIXED",
             "listen": "0.0.0.0",
             "listen_port": 9393
         }
@@ -208,22 +208,22 @@
                 "action": "sniff"
             },
             {
-                "type": "logical",
-                "mode": "or",
-                "rules": [
-                    {
-                        "protocol": "dns"
-                    },
-                    {
-                        "port": 53
-                    }
-                ],
-                "action": "hijack-dns"
-            },
-            {
                 "protocol": "quic",
                 "action": "reject",
                 "no_drop": true
+            },
+            {
+                "type": "logical",
+                "mode": "and",
+                "rules": [
+                    {
+                        "inbound": "SBMIXED"
+                    },
+                    {
+                        "protocol": "dns"
+                    }
+                ],
+                "action": "hijack-dns"
             },
             {
                 "clash_mode": "global",
