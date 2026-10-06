@@ -86,9 +86,9 @@ function render() {
                     </div>
                 </div>
 
-                <pre id="output" class="output"><code>{
-  "outbounds": []
-}</code></pre>
+                <pre id="output" class="output">
+                    <code>{}</code>
+                </pre>
             </section>
 
         </main>
