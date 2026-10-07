@@ -53,8 +53,7 @@
             },
             {
                 "rule_set": "geosite-category-ads-all",
-                "action": "reject",
-                "method": "drop"
+                "action": "reject"
             },
             {
                 "query_type": ["A", "AAAA"],
@@ -283,8 +282,7 @@
             },
             {
                 "rule_set": "geosite-category-ads-all",
-                "action": "reject",
-                "method": "drop"
+                "action": "reject"
             },
             {
                 "action": "resolve",
