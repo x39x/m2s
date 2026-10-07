@@ -1,17 +1,15 @@
 import YAML from "yaml";
+
+import { shadowsocks, vless, anytls, trojan } from "./protocol";
+
 export type Proxy = {
     type: string;
     tag: string;
     [key: string]: any;
 };
 
-import { anytls } from "./protocol/anytls";
-import { ss } from "./protocol/ss";
-import { trojan } from "./protocol/trojan";
-import { vless } from "./protocol/vless";
-
 const converters: Record<string, (proxy: any) => Proxy> = {
-    ss: ss,
+    ss: shadowsocks,
     anytls: anytls,
     trojan: trojan,
     vless: vless,

@@ -41,7 +41,8 @@
         "rules": [
             {
                 "rule_set": "geosite-category-ads-all",
-                "action": "reject"
+                "action": "predefined",
+                "rcode": "NOERROR"
             },
             {
                 "clash_mode": "direct",
