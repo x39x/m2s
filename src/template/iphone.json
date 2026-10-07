@@ -40,6 +40,10 @@
         ],
         "rules": [
             {
+                "rule_set": "geosite-category-ads-all",
+                "action": "reject"
+            },
+            {
                 "clash_mode": "direct",
                 "server": "cn_dns"
             },
@@ -48,19 +52,11 @@
                 "server": "fake_dns"
             },
             {
-                "rule_set": ["lan", "geosite-private"],
-                "server": "cn_dns"
-            },
-            {
-                "rule_set": "geosite-category-ads-all",
-                "action": "reject"
-            },
-            {
                 "query_type": ["A", "AAAA"],
                 "server": "fake_dns"
             },
             {
-                "rule_set": "direct",
+                "rule_set": ["lan", "geosite-private", "direct"],
                 "server": "cn_dns"
             },
             {
