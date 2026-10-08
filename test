@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+curl --get "http://localhost:8788/api/convert" \
+     --data-urlencode "url=https://example.com" \
+     --data-urlencode "url=https://example.com" \
+     --data-urlencode "template=mac" \
+     --data-urlencode "cipher=thanku"
