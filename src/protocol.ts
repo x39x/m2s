@@ -122,8 +122,10 @@ export function trojan(clashProxy: any): any {
 export function vless(clashProxy: any): any {
     const singboxOutbound: any = createCommonOutbound(clashProxy);
     singboxOutbound.uuid = clashProxy.uuid;
-    singboxOutbound.flow = clashProxy.flow ?? "xtls-rprx-vision";
 
+    if (clashProxy.flow !== undefined) {
+        singboxOutbound.flow = clashProxy.flow;
+    }
     if (clashProxy["packet-encoding"] !== undefined) {
         singboxOutbound.packet_encoding = clashProxy["packet-encoding"];
     }
