@@ -55,22 +55,6 @@
             {
                 "query_type": ["A", "AAAA"],
                 "server": "fake_dns"
-            },
-            {
-                "rule_set": ["lan", "geosite-private", "direct"],
-                "server": "cn_dns"
-            },
-            {
-                "rule_set": ["apple_cn", "apple_cdn", "microsoft_cdn"],
-                "server": "cn_dns"
-            },
-            {
-                "rule_set": "domestic",
-                "server": "cn_dns"
-            },
-            {
-                "rule_set": "geosite-geolocation-cn",
-                "server": "cn_dns"
             }
         ],
         "final": "proxy_dns"
@@ -95,11 +79,9 @@
     ],
     "outbounds": [
         {
-            "type": "selector",
-            "tag": "albatross",
-            "interrupt_exist_connections": true,
-            "outbounds": ["cuckoo", "godwit", "seagull"],
-            "default": "cuckoo"
+            "type": "direct",
+            "tag": "swift",
+            "domain_resolver": "cn_dns"
         },
         {
             "type": "selector",
@@ -121,6 +103,13 @@
             "interrupt_exist_connections": true,
             "outbounds": ["urltest"],
             "default": "urltest"
+        },
+        {
+            "type": "selector",
+            "tag": "albatross",
+            "interrupt_exist_connections": true,
+            "outbounds": ["cuckoo", "godwit", "seagull"],
+            "default": "cuckoo"
         },
         {
             "type": "selector",
@@ -162,10 +151,6 @@
             "tag": "urltest",
             "interrupt_exist_connections": true,
             "outbounds": []
-        },
-        {
-            "type": "direct",
-            "tag": "swift"
         }
     ],
     "http_clients": [
